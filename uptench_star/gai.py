@@ -16,34 +16,34 @@ import uptech
 import random
 
 frame = cv2.VideoCapture(-1)
-#frame.set(6,cv2.VideoWriter.fourcc('M','J','P','G'))
-at_detector = apriltag.Detector(apriltag.DetectorOptions(families='tag36h11'))  # åˆ›å»ºä¸€ä¸ªapriltagæ£€æµ‹å™¨
+frame.set(6,cv2.VideoWriter.fourcc('M','J','P','G'))
+at_detector = apriltag.Detector(apriltag.DetectorOptions(families='tag36h11'))  # ´´½¨Ò»¸öapriltag¼ì²âÆ÷
 
 class main_demo:
-    #ï¿½? ï¿½? ï¿½? ï¿½? çº¢å¤–å®šä¹‰
-    FD = 400
+    #Ç° ÓÒ ºó ×ó ºìÍâ¶¨Òå
+    FD = 490
     RD = 560
     BD = 750
     LD = 500
-    # å€¾æ–œè®¡æ—¶
+    # ÇãĞ±¼ÆÊ±
     na = 0
-    # æ¨ç®±å­è®¡ï¿½?
+    # ÍÆÏä×Ó¼ÆÊ±
     nb = 0
-    # æ—‹è½¬è®¡æ—¶
+    # Ğı×ª¼ÆÊ±
     nc = 0
-    # å‰ææµ…è®¡ï¿½?
+    # Ç°¸éÇ³¼ÆÊ±
     nd = 0
-    # åææµ…è®¡ï¿½?
+    # ºó¸éÇ³¼ÆÊ±
     ne = 8
-    # å€¾æ–œ
+    # ÇãĞ±
     qx = 0
-    #è®¾ç½®
+    #ÉèÖÃ
     def __init__(self):
         self.version = "1.0"
         self.servo_speed = 1023
         self.controller = UpController()
         self.controller.lcd_display("MatchDemo")
-        # è®¾ç½®
+        # ÉèÖÃ
         self.controller.set_chassis_mode(0)
         motor_ids = [1, 2]
         servo_ids = [5, 6, 7, 8]
@@ -57,30 +57,30 @@ class main_demo:
         # apriltag_detect.setDaemon(True)
         # apriltag_detect.start()
         
-    #è§†è§‰
+    #ÊÓ¾õ
     def apriltag_detect_thread(self, img):
-        #å°è¯•
+        #³¢ÊÔ
         try:
-            img=img[100:]  # è£å‰ªå›¾åƒ
+            img=img[100:]  # ²Ã¼ôÍ¼Ïñ
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            tags = at_detector.detect(gray)  # è¿›è¡Œapriltagæ£€æµ‹ï¼Œå¾—åˆ°æ£€æµ‹åˆ°çš„apriltagçš„åˆ—ï¿½?
-            key_biggest_s = [-1, -1, -1]  # å­˜å‚¨ç”»é¢ä¸­æœ€å¤§çš„ä¸‰ä¸ªé¢ç§¯
+            tags = at_detector.detect(gray)  # ½øĞĞapriltag¼ì²â£¬µÃµ½¼ì²âµ½µÄapriltagµÄÁĞ??
+            key_biggest_s = [-1, -1, -1]  # ´æ´¢»­ÃæÖĞ×î´óµÄÈı¸öÃæ»ı
 
             for tag in tags:
-                x0, y0 = tuple(tag.corners[0].astype(int))  # è·å–äºŒç»´ç çš„è§’ç‚¹
+                x0, y0 = tuple(tag.corners[0].astype(int))  # »ñÈ¡¶şÎ¬ÂëµÄ½Çµã
                 x1, y1 = tuple(tag.corners[1].astype(int))
                 x2, y2 = tuple(tag.corners[2].astype(int))
                 x3, y3 = tuple(tag.corners[3].astype(int))
 
             
-                #è®¡ç®—é¢ç§¯ï¼ˆè¯¥å…¬å¼ä¸ºå·²çŸ¥ä¸‰ä¸ªç‚¹åæ ‡æ±‚ä¸‰è§’å½¢é¢ç§¯å…¬å¼ï¿½?
+                #¼ÆËãÃæ»ı£¨¸Ã¹«Ê½ÎªÒÑÖªÈı¸öµã×ø±êÇóÈı½ÇĞÎÃæ»ı¹«Ê½??
                 s_ur=(x0*y1-x0*y2+x1*y2-x1*y0+x2*y0-x1*y1)
                 s_dr = (x1*y2-x1*y3+x2*y3-x2*y1+x3*y1-x2*y2)
                 s_dl = (x2*y3-x2*y0+x3*y0-x3*y2+x0*y2-x3*y3)
                 s_ul = (x3*y0-x3*y1+x0*y1-x0*y3+x1*y3-x0*y0)
 
-                if (tag.tag_id) < 3:  # å°†æœ€å¤§çš„é¢ç§¯å­˜å‚¨åˆ°key_longest_sideï¿½?
-                    if s_ul >= s_ur and s_ul >= s_dr and s_ul >= s_dl:  # è·å–æœ€å¤§é¢ï¿½?
+                if (tag.tag_id) < 3:  # ½«×î´óµÄÃæ»ı´æ´¢µ½key_longest_side??
+                    if s_ul >= s_ur and s_ul >= s_dr and s_ul >= s_dl:  # »ñÈ¡×î´óÃæ??
                         key_biggest_s[tag.tag_id] = s_ul
                     elif s_ur >= s_dr and s_ur >= s_dl and s_ur >= s_ul:
                         key_biggest_s[tag.tag_id] = s_ur
@@ -103,70 +103,67 @@ class main_demo:
                 if tag.tag_id == key_index:
                     print(tag.tag_id)
                     return tag.tag_id
-        # #ç»“æŸæ—¶é€šè¿‡
+        # #½áÊøÊ±Í¨¹ı
         # finally:
         #     pass
         except BaseException:
             pass
        
-        
-            
-    
-    # é»˜è®¤ä¸Šå°åŠ¨ä½œï¼ŒæŠ¬èµ·é“²ï¿½?
+    # Ä¬ÈÏÉÏÌ¨¶¯×÷£¬Ì§Æğ²ù×Ó?
     def default_platform(self):
-        self.controller.up.CDS_SetAngle(5, 600, self.servo_speed)
+        self.controller.up.CDS_SetAngle(5, 635, self.servo_speed)
         self.controller.up.CDS_SetAngle(6, 685, self.servo_speed)
-        self.controller.up.CDS_SetAngle(7, 370, self.servo_speed)
+        self.controller.up.CDS_SetAngle(7, 340, self.servo_speed)
         self.controller.up.CDS_SetAngle(8, 295, self.servo_speed)
 
-    # æ”¾ä¸‹å‰çˆª
+    # ·ÅÏÂÇ°×¦
     def pack_up_ahead(self):
-        self.controller.up.CDS_SetAngle(5, 258, self.servo_speed)
+        self.controller.up.CDS_SetAngle(5, 230, self.servo_speed)
         self.controller.up.CDS_SetAngle(7, 700, self.servo_speed)
 
-    # æ”¾ä¸‹åçˆª
+    # ·ÅÏÂºó×¦
     def pack_up_behind(self):
         self.controller.up.CDS_SetAngle(6, 340, self.servo_speed)
         self.controller.up.CDS_SetAngle(8, 620, self.servo_speed)
 
-    # ä¸Šå°åçˆªå­çš„çŠ¶æ€ï¼Œæ”¾ä¸‹é“²å­
+    # ÉÏÌ¨ºó×¦×ÓµÄ×´Ì¬£¬·ÅÏÂ²ù×Ó
     def shovel_state(self):
         self.controller.up.CDS_SetAngle(5, 258, self.servo_speed)
-        self.controller.up.CDS_SetAngle(6, 340, self.servo_speed)
-        self.controller.up.CDS_SetAngle(7, 700, self.servo_speed)
-        self.controller.up.CDS_SetAngle(8, 620, self.servo_speed)
+        self.controller.up.CDS_SetAngle(6, 340, self.servo_speed)  #340
+        self.controller.up.CDS_SetAngle(7, 700, self.servo_speed)  #700
+        self.controller.up.CDS_SetAngle(8, 620, self.servo_speed)  #620
     
-    #åªæ”¶å‰çˆªå­ï¼Œç„¶åä¸å…¨æ”¶å®Œ
+    #Ö»ÊÕÇ°×¦×Ó£¬È»ºó²»È«ÊÕÍê
     def front_paw_half(self):
         self.controller.up.CDS_SetAngle(5, 450, self.servo_speed)
         self.controller.up.CDS_SetAngle(7, 508, self.servo_speed)
     
-    #æ”¶å‰ï¿½?
+    #ÊÕÇ°×¦
     def front_paw(self):
         self.controller.up.CDS_SetAngle(5, 600, self.servo_speed)
         self.controller.up.CDS_SetAngle(7, 360, self.servo_speed)
 
-    #æ”¶åï¿½?
+    #ÊÕºó×¦
     def back_paw(self):
         self.controller.up.CDS_SetAngle(6, 685, self.servo_speed)
         self.controller.up.CDS_SetAngle(8, 295, self.servo_speed)
 
-    # å‰ä¸Šå°åŠ¨ï¿½?
+    # Ç°ÉÏÌ¨¶¯×÷
     def go_up_ahead_platform(self):
         # self.controller.move_cmd(0, 0)
         # time.sleep(0.1)
-        # çˆªå­æŠ¬èµ·
+        # ×¦×ÓÌ§Æğ
         self.default_platform()
         time.sleep(0.2)
-        self.controller.move_cmd(700, 900)
+        self.controller.move_cmd(900, 900)
         time.sleep(0.6)
-        # æ”¯å‰ï¿½?
+        # Ö§Ç°×¦
         self.controller.move_cmd(0, 0)
         self.controller.up.CDS_SetAngle(5, 240, self.servo_speed)
         self.controller.up.CDS_SetAngle(7, 710, self.servo_speed)
         # self.pack_up_ahead()
         time.sleep(0.5)
-        # æ”¶èµ·å‰çˆª
+        # ÊÕÆğÇ°×¦
         self.controller.move_cmd(800,800)
         time.sleep(0.5)
         # self.controller.move_cmd(0,0)
@@ -175,24 +172,26 @@ class main_demo:
         time.sleep(0.2)
         #self.controller.up.CDS_SetAngle(5, 600, self.servo_speed)
         #self.controller.up.CDS_SetAngle(7, 360, self.servo_speed)
-        # æ”¯åï¿½?
+        # Ö§ºó×¦
         #time.sleep(0.5)
         # self.pack_up_behind()
-        self.controller.up.CDS_SetAngle(6, 320, self.servo_speed)
-        self.controller.up.CDS_SetAngle(8, 660, self.servo_speed)
-        time.sleep(1.0)
-        # é»˜è®¤ä¸Šå°
+        self.controller.up.CDS_SetAngle(6, 300, self.servo_speed)#320
+        self.controller.up.CDS_SetAngle(8, 680, self.servo_speed)#660
+        time.sleep(0.8)
+        self.controller.up.CDS_SetAngle(6, 685, self.servo_speed)
+        self.controller.up.CDS_SetAngle(8, 295, self.servo_speed)
+        # Ä¬ÈÏÉÏÌ¨
         #self.controller.up.CDS_SetAngle(6, 700, self.servo_speed)
         #self.controller.up.CDS_SetAngle(8, 300, self.servo_speed)
         # time.sleep(0.5)
         #self.shovel_state()
-        self.controller.move_cmd(500,900)
-        time.sleep(0.3)
+        self.controller.move_cmd(700,700)
+        time.sleep(0.1)
         #self.default_platform()
 
-    # æ£€æµ‹æ˜¯å¦åœ¨å°ä¸Š-è¿”å›çŠ¶ï¿½?
+    # ¼ì²âÊÇ·ñÔÚÌ¨ÉÏ-·µ»Ø×´Ì¬
     def paltform_detect(self):
-        #æ›´æ–°ä¼ æ„Ÿå™¨æ•°ï¿½?
+        #¸üĞÂ´«¸ĞÆ÷ÊıÖµ
         self.controller.edge_test_func()
         angle_sensor = self.controller.adc_data[0]
         ahead_ad = 1 if self.controller.adc_data[1] < 1000 else 0
@@ -207,937 +206,995 @@ class main_demo:
         sum_up = left_ahead_io + left_behind_io + right_ahead_io + right_behind_io
         # if angle_sensor >= 1600 and angle_sensor < 2100:
         if sum_up < 2:
-            # åœ¨å°ï¿½?
+            # ÔÚÌ¨ÏÂ
             return 0
         elif sum_down == 0 and sum_up == 0:
             return 5
         else:
-            # åœ¨å°ï¿½?
+            # ÔÚÌ¨ÉÏ
             return 1
         # elif angle_sensor < 1600:
-        #     # å¡åœ¨æ“‚å°å·¦ä¾§åœ¨åœ°é¢å³ä¾§åœ¨æ“‚å°
+        #     # ¿¨ÔÚÀŞÌ¨×ó²àÔÚµØÃæÓÒ²àÔÚÀŞÌ¨
         #     return 3
         # else:
-        #     # å¡åœ¨æ“‚å°å³ä¾§åœ¨åœ°é¢å·¦ä¾§åœ¨æ“‚å°
+        #     # ¿¨ÔÚÀŞÌ¨ÓÒ²àÔÚµØÃæ×ó²àÔÚÀŞÌ¨
         #     return 4
 
-    #æ›´æ–°åº•éƒ¨çš„å…‰ï¿½?
+    #¸üĞÂµ×²¿µÄ¹âµç
     def bash_fence(self):
-        #æ›´æ–°ä¼ æ„Ÿå™¨æ•°ï¿½?
+        #¸üĞÂ´«¸ĞÆ÷ÊıÖµ
         self.controller.edge_test_func()
-        # åº•éƒ¨å‰æ–¹çº¢å¤–å…‰ç”µ
+        # µ×²¿Ç°·½ºìÍâ¹âµç
         ad1 = self.controller.adc_data[1]
-        # åº•éƒ¨å³ä¾§çº¢å¤–å…‰ç”µ
+        # µ×²¿ÓÒ²àºìÍâ¹âµç
         ad2 = self.controller.adc_data[2]
-        # åº•éƒ¨åæ–¹çº¢å¤–å…‰ç”µ
+        # µ×²¿ºó·½ºìÍâ¹âµç
         ad3 = self.controller.adc_data[3]
-        # åº•éƒ¨å·¦ä¾§çº¢å¤–å…‰ç”µ
+        # µ×²¿×ó²àºìÍâ¹âµç
         ad4 = self.controller.adc_data[4]
 
-        # å‰çº¢å¤–æµ‹è·ä¼ æ„Ÿå™¨
+        # Ç°ºìÍâ²â¾à´«¸ĞÆ÷
         ad5 = self.controller.adc_data[5]
-        # å³çº¢å¤–æµ‹è·ä¼ æ„Ÿå™¨
+        # ÓÒºìÍâ²â¾à´«¸ĞÆ÷
         ad6 = self.controller.adc_data[6]
-        # åçº¢å¤–æµ‹è·ä¼ æ„Ÿå™¨
+        # ºóºìÍâ²â¾à´«¸ĞÆ÷
         ad7 = self.controller.adc_data[7]
-        # å·¦çº¢å¤–æµ‹è·ä¼ æ„Ÿå™¨
+        # ×óºìÍâ²â¾à´«¸ĞÆ÷
         ad8 = self.controller.adc_data[8]
         
-        #å‰å¯¹æ“‚å°ä¸”æ²¡æœ‰éšœç¢ç‰©
+        #Ç°¶ÔÀŞÌ¨ÇÒÃ»ÓĞÕÏ°­Îï
         if ad1 < 1000 and ad5 < self.FD:
             return 0
-        #åå¯¹æ“‚å°æˆ–è€…æ“‚å°ä¸Šæœ‰éšœç¢ç‰©æˆ–è€…æ•Œï¿½?
+        #ºó¶ÔÀŞÌ¨»òÕßÀŞÌ¨ÉÏÓĞÕÏ°­Îï»òÕßµĞÈË
         elif ad1 < 1000 and ad5 > self.FD:
             return 1
-        #å…¶ä»–çŠ¶ï¿½?
+        #ÆäËû×´Ì¬
         else:
             return 2
 
-    #ä¸Šæ–¹å…‰ç”µæ£€æµ‹ï¼Œæ£€æµ‹è¾¹ï¿½?
+    #ÉÏ·½¹âµç¼ì²â£¬¼ì²â±ßÔµ
     def edge_detect(self):
-        #æ›´æ–°ä¼ æ„Ÿå™¨æ•°ï¿½?
+        #¸üĞÂ´«¸ĞÆ÷ÊıÖµ
         self.controller.edge_test_func()
-        # å·¦å‰çº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ×óÇ°ºìÍâ¹âµç´«¸ĞÆ÷
         io_0 = self.controller.io_data[0]
-        # å³å‰çº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ÓÒÇ°ºìÍâ¹âµç´«¸ĞÆ÷
         io_1 = self.controller.io_data[1]
-        # å³åçº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ÓÒºóºìÍâ¹âµç´«¸ĞÆ÷
         io_2 = self.controller.io_data[2]
-        # å·¦åçº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ×óºóºìÍâ¹âµç´«¸ĞÆ÷
         io_3 = self.controller.io_data[3]
 
         
         if io_0 == 0 and io_1 == 0 and io_2 == 0 and io_3 == 0:
-            #åœ¨æ“‚å°ä¸Šï¼Œæœªæ£€æµ‹åˆ°è¾¹ç¼˜
+            #ÔÚÀŞÌ¨ÉÏ£¬Î´¼ì²âµ½±ßÔµ
             return 0
         elif io_0 == 1 and io_1 == 0 and io_2 == 0 and io_3 == 0:
-            #å·¦å‰æ£€æµ‹åˆ°è¾¹ç¼˜
+            #×óÇ°¼ì²âµ½±ßÔµ
             return 1
         elif io_0 == 0 and io_1 == 1 and io_2 == 0 and io_3 == 0:
-            #å³å‰æ£€æµ‹åˆ°è¾¹ç¼˜
+            #ÓÒÇ°¼ì²âµ½±ßÔµ
             return 2
         elif io_0 == 0 and io_1 == 0 and io_2 == 1 and io_3 == 0:
-            #å³åæ£€æµ‹åˆ°è¾¹ç¼˜
+            #ÓÒºó¼ì²âµ½±ßÔµ
             return 3
         elif io_0 == 0 and io_1 == 0 and io_2 == 0 and io_3 == 1:
-            #å·¦åæ£€æµ‹åˆ°è¾¹ç¼˜
+            #×óºó¼ì²âµ½±ßÔµ
             return 4
         elif io_0 == 1 and io_1 == 1 and io_2 == 0 and io_3 == 0:
-            #å‰æ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #Ç°·½¼ì²âµ½±ßÔµ
             return 5
         elif io_0 == 0 and io_1 == 0 and io_2 == 1 and io_3 == 1:
-            #åæ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #ºó·½¼ì²âµ½±ßÔµ
             return 6
         elif io_0 == 1 and io_1 == 0 and io_2 == 0 and io_3 == 1:
-            #å·¦æ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #×ó·½¼ì²âµ½±ßÔµ
             return 7
         elif io_0 == 0 and io_1 == 1 and io_2 == 1 and io_3 == 0:
-            #å³æ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #ÓÒ·½¼ì²âµ½±ßÔµ
             return 8
         else:
             return 102
 
-    #åœ¨è¾¹ç¼˜åšå¯¹åº”çš„åŠ¨ï¿½?
+    #ÔÚ±ßÔµ×ö¶ÔÓ¦µÄ¶¯×÷
     def edge_action(self):
-        #æ›´æ–°ä¼ æ„Ÿå™¨æ•°ï¿½?
+        #¸üĞÂ´«¸ĞÆ÷ÊıÆ÷
         self.controller.edge_test_func()
-        # å·¦å‰çº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ×óÇ°ºìÍâ¹âµç´«¸ĞÆ÷
         io_0 = self.controller.io_data[0]
-        # å³å‰çº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ÓÒÇ°ºìÍâ¹âµç´«¸ĞÆ÷
         io_1 = self.controller.io_data[1]
-        # å³åçº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ÓÒºóºìÍâ¹âµç´«´«¸ĞÆ÷
         io_2 = self.controller.io_data[2]
-        # å·¦åçº¢å¤–å…‰ç”µä¼ æ„Ÿï¿½?
+        # ×óºóºìÍâ¹âµç´«¸ĞÆ÷
         io_3 = self.controller.io_data[3]
         
         t = time.time()
         
         if io_0 == 0 and io_1 == 0 and io_2 == 0 and io_3 == 0:
-            #åœ¨æ“‚å°ä¸Šï¼Œæœªæ£€æµ‹åˆ°è¾¹ç¼˜
+            #ÔÚÀŞÌ¨ÉÏ£¬Î´¼ì²âµ½±ßÔµ
             if self.edge_detect() == 0 :
-                self.controller.move_cmd(700, 700)
+                self.controller.move_cmd(600, 600)
             return 0
         elif io_0 == 1 and io_1 == 0 and io_2 == 0 and io_3 == 0:
-            #å·¦å‰æ£€æµ‹åˆ°è¾¹ç¼˜
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜åé€€
+            #×óÇ°¼ì²âµ½±ßÔµ
+            #Î´¼ì²âµ½±ßÔµºóÍË
             while((time.time()-t)<0.5 and self.edge_detect != 0):
                 self.controller.move_cmd(-800, -800)
-            #æ›´æ–°t
+            #¸üĞÂt
             t = time.time()
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜æ—‹è½¬
+            #Î´¼ì²âµ½±ßÔµĞı×ª
             while((time.time()-t)<0.5 and self.edge_detect == 1):
                 self.controller.move_cmd(800, -800)
             self.controller.move_cmd(800, 800)
             return 1
         elif io_0 == 0 and io_1 == 1 and io_2 == 0 and io_3 == 0:
-            #å³å‰æ£€æµ‹åˆ°è¾¹ç¼˜
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜åé€€
+            #ÓÒÇ°¼ì²âµ½±ßÔµ
+            #Î´¼ì²âµ½±ßÔµºóÍË
             while((time.time()-t)<0.5 and self.edge_detect == 2):
                 self.controller.move_cmd(-800, -800)
             t = time.time()
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜æ—‹è½¬
+            #Î´¼ì²âµ½±ßÔµĞı×ª
             while((time.time()-t)<0.5 and self.edge_detect == 0):
                 self.controller.move_cmd(-800, 800)
             time.sleep(0.5)
             self.controller.move_cmd(800, 800)
             return 2
         elif io_0 == 0 and io_1 == 0 and io_2 == 1 and io_3 == 0:
-            #å³åæ£€æµ‹åˆ°è¾¹ç¼˜
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜åé€€
+            #ÓÒºó¼ì²âµ½±ßÔµ
+            #Î´¼ì²âµ½±ßÔµºóÍË
             while((time.time()-t)<0.5 and self.edge_detect == 3):
                 self.controller.move_cmd(950, 950)
             t = time.time()
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜æ—‹è½¬
+            #Î´¼ì²âµ½±ßÔµĞı×ª
             while((time.time()-t)<0.5 and self.edge_detect == 0):
                 self.controller.move_cmd(850, -750)
             return 3
         elif io_0 == 0 and io_1 == 0 and io_2 == 0 and io_3 == 1:
-            #å·¦åæ£€æµ‹åˆ°è¾¹ç¼˜
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜åé€€
+            #×óºó¼ì²âµ½±ßÔµ
+            #Î´¼ì²âµ½±ßÔµºóÍË
             while((time.time()-t)<0.5 and self.edge_detect == 4):
                 self.controller.move_cmd(950, 950)
             t = time.time()
-            #æœªæ£€æµ‹åˆ°è¾¹ç¼˜æ—‹è½¬
+            #Î´¼ì²âµ½±ßÔµĞı×ª
             while((time.time()-t)<0.5 and self.edge_detect == 0):
                 self.controller.move_cmd(-750, 850)
             return 4
         elif io_0 == 1 and io_1 == 1 and io_2 == 0 and io_3 == 0:
-            #å‰æ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #Ç°·½¼ì²âµ½±ßÔµ
             while((time.time()-t)<0.5 and self.edge_detect == 5):
                 self.controller.move_cmd(-800, -800)
             time.sleep(0.2)
             t = time.time()
-            #éšæœºæ•°çš„ç§å­ç”Ÿæˆ
+            #Ëæ»úÊıµÄÖÖ×ÓÉú³É
             random.seed(t)
             a = random.randint(1,2)
             if a == 1:
-                #å·¦è½¬
+                #×ó×ª
                 self.controller.move_cmd(-800, 800)
                 time.sleep(0.2)
             else:
-                #å³è½¬
+                #ÓÒ×ª
                 self.controller.move_cmd(800, -800)
                 time.sleep(0.2)
             return 5
         elif io_0 == 0 and io_1 == 0 and io_2 == 1 and io_3 == 1:
-            #åæ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #ºó·½¼ì²âµ½±ßÔµ
             while((time.time()-t)<0.5 and self.edge_detect == 6):
                 self.controller.move_cmd(950, 950)
             return 6
         elif io_0 == 1 and io_1 == 0 and io_2 == 0 and io_3 == 1:
-            #å·¦æ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #×ó·½¼ì²âµ½±ßÔµ
             self.controller.move_cmd(950, -950)
             time.sleep(0.2)
             self.controller.move_cmd(950, 950)
             time.sleep(0.2)
             return 7
         elif io_0 == 0 and io_1 == 1 and io_2 == 1 and io_3 == 0:
-            #å³æ–¹æ£€æµ‹åˆ°è¾¹ç¼˜
+            #ÓÒ·½¼ì²âµ½±ßÔµ
             self.controller.move_cmd(-950, 950)
             time.sleep(0.2)
             self.controller.move_cmd(950, 950)
             time.sleep(0.2)
             return 8
         else:
-            #ä¸çŸ¥é“ä»€ä¹ˆæƒ…å†µï¼Œä¹±åŠ¨
+            #²»ÖªµÀÊ²Ã´Çé¿ö£¬ÂÒ¶¯
             self.randomm()
             return 102
 
-    # æ•Œäººæ£€ï¿½?
+    # µĞÈË¼ì²â
     def enemy_detect(self):
-        #æ›´æ–°ä¼ æ„Ÿå™¨æ•°ï¿½?
+        #¸üĞÂ´«¸ĞÆ÷ÊıÖµ
         self.controller.edge_test_func()
-        # åº•éƒ¨å‰æ–¹çº¢å¤–å…‰ç”µ
+        # µ×²¿Ç°·½ºìÍâ¹âµç´«¸ĞÆ÷
         ad1 = self.controller.adc_data[1]
-        # åº•éƒ¨å³ä¾§çº¢å¤–å…‰ç”µ
+        # µ×²¿ÓÒ²àºìÍâ¹âµç´«¸ĞÆ÷
         ad2 = self.controller.adc_data[2]
-        # åº•éƒ¨åæ–¹çº¢å¤–å…‰ç”µ
+        # µ×²¿ºó·½ºìÍâ¹âµç´«¸ĞÆ÷
         ad3 = self.controller.adc_data[3]
-        # åº•éƒ¨å·¦ä¾§çº¢å¤–å…‰ç”µ
+        # µ×²¿×ó²àºìÍâ¹âµç´«¸ĞÆ÷
         ad4 = self.controller.adc_data[4]
-        # å‰çº¢å¤–æµ‹è·ä¼ æ„Ÿå™¨
+        # Ç°ºìÍâ²â¾à´«¸ĞÆ÷
         ad5 = self.controller.adc_data[5]
 
         if ad1 > 100 and ad2 > 100 and ad3 > 100 and ad4 > 100:
-            # æ— æ•Œï¿½?
+            # ÎŞµĞÈË
             return 0
-        #å‰æ–¹æ£€æµ‹åˆ°æœ‰ä¸œï¿½?
+        #Ç°·½¼ì²âµ½ÓĞ¶«Î÷
         elif (ad1 < 100 ) :
             if (ad5 < self.FD):
-                #éšœç¢ï¿½?
+                #ÕÏ°­Îï
                 return 11
             else:
                 return 1
         elif ad3 < 100 :
-            # åæ–¹æœ‰æ•Œäººæˆ–æ£‹å­
+            # ºó·½ÓĞµĞÈË»òÆå×Ó
             return 2
         elif (ad1 > 100 and ad2 < 100 and ad3 > 100 and ad4 > 100) or (ad1 > 100 and ad2 < 100 and ad3 > 100 and ad4 < 100):      
-            # å³ä¾§æœ‰æ•Œäººæˆ–æ£‹å­ or å·¦å³ä¸¤ä¾§éƒ½æœ‰éšœç¢
+            # ÓÒ²àÓĞµĞÈË»òÆå×Ó or ×óÓÒÁ½²à¶¼ÓĞÕÏ°­
             return 3
         elif ad1 > 100 and ad2 > 100 and ad3 > 100 and ad4 < 100:
-            # å·¦ä¾§æœ‰æ•Œäººæˆ–æ£‹å­
+            # ×ó²àÓĞµĞÈË»òÆå×Ó
             return 4
         else:
             return 103    
 
-    #éšæœºè¿åŠ¨
+    #Ëæ»úÔË¶¯
     def randomm(self):
         t = time.time()
-        #éšæœºæ•°çš„ç§å­ç”Ÿæˆ
+        #Ëæ»úÊıµÄÖÖ×ÓÉú³É
         random.seed(t)
-        #æ”¾çˆªï¿½?
+        #·Å×¦×Ó
         a = random.randint(1,2)
-        #è¿è¡Œæ–¹å‘
+        #ÔËĞĞ·½Ïò
         b = random.randint(1,4)
         if a == 1:
-            #æ”¾åï¿½?
+            #·Åºó×¦
             self.pack_up_behind()
         elif a == 2:
-            #æ”¾å‰ï¿½?
-            self.pack_up_behind()
+            #·ÅÇ°×¦
+            self.pack_up_ahead()
         if b == 1:
-            #å·¦è½¬
+            #×ó×ª
+            self.controller.move_cmd(-700, 700)
+            time.sleep(0.6)
+        elif b == 2:
+            #ÓÒ×ª
+            self.controller.move_cmd(700, -700)
+            time.sleep(0.6)
+        elif b == 3:
+            #Ç°½ø
+            self.controller.move_cmd(600, 600)
+            time.sleep(0.6)
+        elif b == 4:
+            #ºóÍË
+            self.controller.move_cmd(600, 600)
+            time.sleep(0.6)
+
+    def randommm(self):
+        t = time.time()
+        #Ëæ»úÊıµÄÖÖ×ÓÉú³É
+        random.seed(t)
+        #·Å×¦×Ó
+        a = random.randint(1,2)
+        #ÔËĞĞ·½Ïò
+        b = random.randint(1,4)
+        if a == 1:
+            #·Åºó×¦
+            self.back_paw()
+        elif a == 2:
+            #·ÅÇ°×¦
+            self.pack_up_ahead()
+        if b == 1:
+            #×ó×ª
             self.controller.move_cmd(-900, 900)
             time.sleep(0.6)
         elif b == 2:
-            #å³è½¬
+            #ÓÒ×ª
             self.controller.move_cmd(900, -900)
             time.sleep(0.6)
         elif b == 3:
-            #å‰è¿›
+            #Ç°½ø
             self.controller.move_cmd(900, 900)
             time.sleep(0.6)
         elif b == 4:
-            #åé€€
+            #ºóÍË
             self.controller.move_cmd(900, 900)
             time.sleep(0.6)
 
-
-    #æ£€æµ‹å‰æ–¹æ˜¯å¦æ˜¯æ‚¬å´–   1æ˜¯å³éšœç¢ç‰©ï¼Œè¯´æ˜æ˜¯åœ¨å°ä¸Šæœªæ£€æµ‹åˆ°æ‚¬å´–ï¼Œå¦åˆ™æ£€æµ‹åˆ°æ‚¬å´–
+    #¼ì²âÇ°·½ÊÇ·ñÊÇĞüÑÂ   1ÊÇÓÒÕÏ°­Îï£¬ËµÃ÷ÊÇÔÚÌ¨ÉÏÎ´¼ì²âµ½ĞüÑÂ£¬·ñÔò¼ì²âµ½ĞüÑÂ
     def cliff(self):
-        #æ›´æ–°ä¼ æ„Ÿå™¨æ•°ï¿½?
+        #¸üĞÂ´«¸ĞÆ÷ÊıÖµ
         self.controller.edge_test_func()
-        # é“²å­ï¿½?
+        # ²ù×Ó×ó
         io_l = self.controller.io_data[4]
-        # é“²å­ï¿½?
+        # ²ù×ÓÓÒ
         io_r = self.controller.io_data[5]
         if io_l == 1 and io_r == 0:
-            #å³å‰æ£€æµ‹åˆ°æ‚¬å´–
+            #ÓÒÇ°¼ì²âµ½ĞüÑÂ
             return 1
         if io_l == 0 and io_r == 1:
-            #å·¦å‰æ£€æµ‹åˆ°æ‚¬å´–
+            #×óÇ°¼ì²âµ½ĞüÑÂ
             return 2
         if io_l == 0 and io_r == 0:
-            #æ­£å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–
+            #ÕıÇ°·½¼ì²âµ½ĞüÑÂ
             return 3
         else:
-            #åœ¨å°ä¸Šä¸€åˆ‡æ­£ï¿½?
+            #ÔÚÌ¨ÉÏÒ»ÇĞÕı³£
             return 4
 
     def start_match(self):
-        #åˆå§‹åŒ–ï¼Œæ”¶èµ·å››ä¸ªé“²å­
+        #³õÊ¼»¯£¬ÊÕÆğËÄ¸ö²ù×Ó
         self.default_platform()    
         time.sleep(1)
 
-        ##è½¯å¼€ï¿½?
+        ##Èí¿ª¹Ø
         ad8 = self.controller.adc_data[8]
         ad6 = self.controller.adc_data[6]
         while(ad8 <= 1500 and ad6 <= 1500):
-           # print("æˆ‘æ–¹é˜Ÿä¼ï¿½?")
+           # print("ÎÒ·½¶ÓÎéÑÕÉ«")
             ad8 = self.controller.adc_data[8]
             ad6 = self.controller.adc_data[6]
-        #å·¦è¾¹æµ‹è·é»„æ–¹
+        #×ó±ß²â¾à»Æ·½
         if(ad8 > 1500):
-            print("æˆ‘æ–¹ä¸ºé»„ï¿½?")
+            print("ÎÒ·½Îª»Æ·½")
             our_side = 0
-        #å³ä¾§æµ‹è·è“æ–¹
+        #ÓÒ²à²â¾àÀ¶·½
         if(ad6 > 1500):
-            print("æˆ‘æ–¹ä¸ºè“ï¿½?")
+            print("ÎÒ·½ÎªÀ¶·½")
             our_side = 1
 
 
-        #åˆ¤æ–­æ˜¯ä¸æ˜¯å¤§é‡é‡å¤ä¸€ä¸ªåˆ¤æ–­é‚£ææœ‰å¯èƒ½æ˜¯å¡ä½äº†
+        #ÅĞ¶ÏÊÇ²»ÊÇ´óÁ¿ÖØ¸´Ò»¸öÅĞ¶ÏÄÇ¼«ÓĞ¿ÉÄÜÊÇ¿¨×¡ÁË
         repeat = 0
-        #çŠ¶æ€å‚¨ï¿½?
+        #×´Ì¬´¢´æ
         state_storage = 0
-        #å°ä¸‹å…¶ä»–çŠ¶æ€çš„æ¬¡æ•°
+        #Ì¨ÏÂÆäËû×´Ì¬µÄ´ÎÊı
         taixia = 0
         taixia_1 = 0
-        # ##å‰è¿›ä¸€æ®µè·ï¿½?
+        # ##Ç°½øÒ»¶Î¾àÀë
         # self.controller.move_cmd(900, 900)
         # time.sleep(0.4)
-        # #å³è½¬
+        # #ÓÒ×ª
         # self.controller.move_cmd(600, 900)
         # time.sleep(0.2)
-        # ##å‰ä¸Šï¿½?   
-        self.go_up_ahead_platform()
-        # #å³è½¬æŠ¢å ä¸­é—´èƒ½é‡ï¿½?
-        self.controller.move_cmd(-500,900)
-        time.sleep(0.5)
+        # ##Ç°ÉÏÌ¨  
+        #self.go_up_ahead_platform()
+        # #ÓÒ×ªÇÀÕ¼ÖĞ¼äÄÜÁ¿¿é
+        #self.controller.move_cmd(-500,900)
+        #time.sleep(0.1)
 
-        #å¼€å§‹æ­»å¾ªç¯ï¼Œåˆ¤æ–­æ˜¯ä¸æ˜¯åœ¨å°ï¿½?
+        #¿ªÊ¼ËÀÑ­»·£¬ÅĞ¶ÏÊÇ²»ÊÇÔÚÌ¨ÏÂ
         while 1:
-            #æ£€æµ‹æ˜¯å¦åœ¨å°ä¸Š
-            # 0ä¸ºåœ¨å°ä¸‹ï¿½?1ä¸ºåœ¨å°ä¸Šï¿½?5ï¿½?8ä¸ªå…‰ç”µéƒ½ä¸ºæ£€æµ‹åˆ°
+            #¼ì²âÊÇ·ñÔÚÌ¨ÉÏ
+            # 0ÎªÔÚÌ¨ÏÂ 1ÎªÔÚÌ¨ÉÏ ·µ»Ø5 8¸ö¹âµç¶¼Îª¼ì²âÎ´µ½¸¡¿Õ
             stage = self.paltform_detect()
-            #åœ¨å°ï¿½?,ä¸€çº§åˆ¤ï¿½?
+            #ÔÚÌ¨ÏÂ,Ò»¼¶ÅĞ¶Ï
             if stage == 0:
-                #æ”¶çˆªï¿½?
-                self.default_platform()         
-                print("stage",stage,"åœ¨å°ï¿½?")
-                #ä¸‹å°äº†ç„¶åå¼€å§‹åˆ¤æ–­æœ‰æ²¡æœ‰ä¸Šå°æ¥åˆ¤æ–­æ˜¯ä¸æ˜¯å†å°ä¸Šæ˜¯ä¸æ˜¯
+                #ÊÕ×¦×Ó
+                self.default_platform()
+                print("stage",stage,"ÔÚÌ¨ÏÂ")
+                #ÏÂÌ¨ÁËÈ»ºó¿ªÊ¼ÅĞ¶ÏÓĞÃ»ÓĞÉÏÌ¨À´ÅĞ¶ÏÊÇ²»ÊÇÔÙÌ¨ÉÏÊÇ²»ÊÇ
                 not_on_stage = 1
-                #é‡å¤å€¼åˆå§‹åŒ–
+                #ÖØ¸´Öµ³õÊ¼»¯
                 repeat = 0
                 while (not_on_stage == 1):
-                    #æ”¶çˆªï¿½?
-                    self.default_platform() 
-                    #æ›´æ–°åº•éƒ¨çš„å…‰ï¿½?
+                    #ÊÕ×¦×Ó
+                    self.default_platform()
+                    #¸üĞÂµ×²¿µÄ¹âµç
                     basee = self.bash_fence()
-                    print("åº•éƒ¨çš„å…‰ç”µçŠ¶ï¿½?",basee)
-                    print("æ˜¯å¦æœªå½»åº•ç™»ä¸Šå°,1ï¿½?,0ï¿½?",not_on_stage)
+                    print("µ×²¿µÄ¹âµç×´Ì¬?",basee)
+                    print("ÊÇ·ñÎ´³¹µ×µÇÉÏÌ¨,1ÊÇ,0·ñ",not_on_stage)
                     
-                    #å‰æ–¹å¯¹æ“‚ï¿½?
+                    #Ç°·½¶ÔÀŞÌ¨
                     if basee == 0:
-                        #å°ä¸‹çŠ¶æ€å…¶ä»–å½’ï¿½?
+                        #Ì¨ÏÂ×´Ì¬ÆäËû×´Ì¬
                         taixia = 0
-                        #å‰è¿›ä»¥å
-                        print("å‰æ–¹å¯¹æ“‚ï¿½?")
+                        #Ç°½øÒÔºó
+                        print("Ç°·½¶ÔÀŞÌ¨?")
                         self.controller.move_cmd(900, 900)
-                        time.sleep(0.6)
-                        #å‰ä¸Šï¿½?   
+                        time.sleep(0.3)
+                        #Ç°ÉÏÌ¨?
                         self.go_up_ahead_platform()
-                        #å®šæ—¶
+                        #¶¨Ê±
                         t = time.time()
-                        #ä¸Šå°äº†ï¼Œå¯ä»¥æ›´æ”¹åœ¨å°ä¸‹çš„å€¼äº†ï¼Œè·³å‡ºå¾ªï¿½?
-                        while((time.time() - t < 2.5) and (self.edge_detect() != 0)):
-                            print("å¡åœ¨ä¸Šå°è¿™ä¸€æ­¥äº†")
-                            #æœªä¸Šå°éšæœºè¿ï¿½?
-                            self.randomm()
-                        #åœ¨åˆ¤æ–­æœ‰æ²¡æœ‰åœ¨å°ä¸Šï¼Œè¦å››ä¸ªå…¨äº®æ‰ï¿½?
+                        #ÉÏÌ¨ÁË£¬¿ÉÒÔ¸ü¸ÄÔÚÌ¨ÏÂµÄÖµÁË£¬Ìø³öÑ­»·
+                        while((time.time() - t < 1.0) and (self.edge_detect() != 0)):
+                            print("¿¨ÔÚÉÏÌ¨ÕâÒ»²½ÁË")
+                            #Î´ÉÏÌ¨Ëæ»úÔË¶¯
+                            self.randommm()
+                        #ÔÚÅĞ¶ÏÓĞÃ»ÓĞÔÚÌ¨ÉÏ£¬ÒªËÄ¸öÈ«ÁÁ²ÅËã
                         if(self.edge_detect() == 0):
-                            print("è·³å‡ºä¸Šå°ç¨‹åº")
-                            #ä¸Šå°äº†å¯ä»¥è·³å‡ºå¾ªç¯äº†ç»™å…¶èµ‹ä¸€
+                            print("Ìø³öÉÏÌ¨³ÌĞò")
+                            #ÉÏÌ¨ÁË¿ÉÒÔÌø³öÑ­»·ÁË¸øÆä¸³Ò»
                             not_on_stage = 0
                             
 
                     else:
-                        print("å…¶ä»–çŠ¶ï¿½?")
-                        #åé€€
+                        print("ÆäËû×´Ì¬?")
+                        #ºóÍË
                         self.controller.move_cmd(-700, -700)
-                        time.sleep(0.2)
-                        #æ”¶çˆªï¿½?
+                        time.sleep(0.1)
+                        #ÊÕ×¦?
                         self.default_platform() 
-                        #è¯»å–æ—¶é—´,è¶…æ—¶å°±å‘ï¿½?
+                        #¶ÁÈ¡Ê±¼ä,³¬Ê±¾ÍÏò?
                         t = time.time()
-                        #è¶…æ—¶æˆ–å‰æ–¹æœªæ£€æµ‹åˆ°æ“‚å°æ— æ•Œï¿½?
+                        #³¬Ê±»òÇ°·½Î´¼ì²âµ½ÀŞÌ¨ÎŞµĞÈË?
                         while (self.bash_fence() != 0):
-                            if ((time.time()-t)<1):
-                                #æ—‹è½¬
-                                self.controller.move_cmd(-900, 900)
+                            if ((time.time()-t)<0.5):
+                                #Ğı×ª
+                                self.controller.move_cmd(-800, 800)
                             else :
-                                self.controller.move_cmd(900, 900)
-                                time.sleep(0.6)
-                                #æ›´æ–°ï¿½?
+                                self.controller.move_cmd(800, 800)
+                                time.sleep(0.1)
+                                #¸üĞÂt?
                                 t = time.time()
-                            #æ›´æ–°åœ¨å°ä¸‹çš„ï¿½?
-                            print("åœ¨å°ä¸‹çš„æ¬¡æ•°",taixia_1)
-                            if taixia == 1:
-                                taixia_1 = taixia_1 + 1
-                            if taixia_1 >= 50:
-                                print("å…¶ä»–è¿åŠ¨å¤ªé•¿å¼€å§‹éšï¿½?")
-                                #éšæœºè¿åŠ¨
-                                self.randomm()
-                                taixia_1 = 0
+                            #¸üĞÂÔÚÌ¨ÏÂµÄ×´Ì¬
+                            print("ÔÚÌ¨ÏÂµÄ´ÎÊı",taixia_1)
+                            # if taixia == 1:
+                            #     taixia_1 = taixia_1 + 1
+                            # if taixia_1 >= 20:
+                            #     print("ÆäËûÔË¶¯Ì«³¤¿ªÊ¼Ëæ»ú?")
+                            #     #Ëæ»úÔË¶¯
+                            #     self.randomm()
+                            #     taixia_1 = 0
+                            self.paltform_detect()
                             taixia = 1
 
-            #åœ¨å°ï¿½?,ä¸€çº§åˆ¤ï¿½?
+            #ÔÚÌ¨ÉÏ,Ò»¼¶ÅĞ¶Ï
             elif stage == 1:
-                print("åœ¨å°ï¿½?")
-                #ä¸€ä¸ªå˜ï¿½?
+                print("ÔÚÌ¨ÉÏ")
+                #Ò»¸ö±äÁ¿
                 p = 0
-                #æ”¾ä¸‹é“²å­
+                #·ÅÏÂ²ù×Ó
                 self.pack_up_ahead()
-                self.pack_up_behind()  
-                #è¯»å–è¾¹ç¼˜æ£€ï¿½?
+                #self.pack_up_behind()
+                self.back_paw()  
+                #¶ÁÈ¡±ßÔµ¼ì²â
                 edge = self.edge_detect()
                 nnn = time.time()
-                #å¦‚æœåœ¨å°ä¸Šæœªæ£€æµ‹åˆ°è¾¹ç¼˜å¼€å§‹æ­»å¾ªç¯å‡å°‘æ­¥éª¤æ—¶é—´1.5çº§åˆ¤ï¿½?
+                #Èç¹ûÔÚÌ¨ÉÏÎ´¼ì²âµ½±ßÔµ¿ªÊ¼ËÀÑ­»·¼õÉÙ²½ÖèÊ±¼ä1.5¼¶ÅĞ¶Ï
                 while(edge == 0 and p == 0):
-                    print("æœªæ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #é‡å¤å€¼ä¸º0åˆå§‹ï¿½?
+                    print("Î´¼ì²âµ½±ßÔµ")
+                    #ÖØ¸´ÖµÎª0³õÊ¼0
                     repeat = 0
-                    #æ‚¬å´–æ£€ï¿½?
+                    #ĞüÑÂ¼ì²â
                     clif = self.cliff()
-                    #æ›´æ–°è¾¹ç¼˜
+                    #¸üĞÂ±ßÔµ
                     edge = self.edge_detect()
-                    # #æ”¾ä¸‹é“²å­
+                    # #·ÅÏÂ²ù×Ó
                     # self.pack_up_ahead()
-                    # self.pack_up_behind() 
-                    ##é¿éšœæœªæ£€æµ‹åˆ°æ‚¬å´–,äºŒçº§åˆ¤æ–­
+                    # self.pack_up_behind()
+                    ##±ÜÕÏÎ´¼ì²âµ½ĞüÑÂ,¶ş¼¶ÅĞ¶Ï
                     while(self.cliff() == 4):
-                        #å®šä¹‰åˆå§‹é€Ÿåº¦
+                        #¶¨Òå³õÊ¼ËÙ¶È
                         v1 = 0
-                        #å®šä¹‰ä¸€ä¸ªåˆå§‹çš„æ—¶é—´
+                        #¶¨ÒåÒ»¸ö³õÊ¼µÄÊ±¼ä
                         t = time.time()
-                        #æ›´æ–°è¾¹ç¼˜
+                        #¸üĞÂ±ßÔµ
                         edge = self.edge_detect()
-                        #ä¸æ˜¯åœ¨å°ï¿½?
+                        #²»ÊÇÔÚÌ¨ÏÂ
                         if edge != 0:
                             p = 1
                             break
 
-                        #åœ¨å°ï¿½?    
+                        #ÔÚÌ¨ÉÏ    
                         else:
-                            #æ›´æ–°åº•å±‚çš„å…‰ç”µåˆ¤æ–­æ˜¯å¦æœ‰éšœç¢ï¿½?
+                            #¸üĞÂµ×²ãµÄ¹âµçÅĞ¶ÏÊÇ·ñÓĞÕÏ°­Îï
                             enemy = self.enemy_detect()
 
-                            #æœªæ£€æµ‹åˆ°éšœç¢ç‰©ä¸‰çº§åˆ¤ï¿½?
+                            #Î´¼ì²âµ½ÕÏ°­ÎïÈı¼¶ÅĞ¶Ï
                             if enemy == 0:
-                                #è®¡ç®—å¼€å¯çš„æ—¶é—´ï¿½?
+                                #¼ÆËã¿ªÆôµÄÊ±¼ä
                                 now_time = time.time() - t
-                                # #å¦‚æœï¿½?0.06ç§’å†…æ»¡è¶³çº¿æ€§å…³ï¿½?
+                                # #Èç¹û³¬¹ı0.06ÃëÄÚÂú×ãÏßĞÔ¹ØÏµ
                                 # if now_time < 0.06:
                                 #     v = 900 - 5000 * now_time * now_time
                                 #     if v > 790 :
                                 #         v = 790
-                                #     print("æ»¡è¶³çº¿æ€§å…³ç³»v = ",int(v))
+                                #     print("Âú×ãÏßĞÔ¹ØÏµv = ",int(v))
                                 #     self.controller.move_cmd(int(v), int(v))
-                                #å¦‚æœæ—¶é—´å·®åœ¨0.02så†…å¿«ï¿½?
+                                #Èç¹ûÊ±¼ä²îÔÚ0.02sÄÚ¿ìËÙ
                                 if now_time < 0.02:
-                                    #å‰è¿›
-                                    #print("å¿«å‰ï¿½?")
-                                    self.controller.move_cmd(700, 700)
-                                #å¦‚æœæ—¶é—´å·®åœ¨0.05å†…å¯ä»¥ç¨å¾®æ…¢ï¿½?
-                                elif now_time >= 0.02 and now_time < 0.06:
-                                    #æ…¢å‰ï¿½?
-                                    #print("æ…¢å‰ï¿½?")
-                                    self.controller.move_cmd(600, 600)
-                                #è¶…æ—¶äº†è¿‘ä¹åœï¿½?
+                                    #Ç°½ø
+                                    #print("¿ìÇ°½ø")
+                                    self.controller.move_cmd(630, 630)
+                                #Èç¹ûÊ±¼ä²îÔÚ0.05ÄÚ¿ÉÒÔÉÔÎ¢ÂıËÙ
+                                elif now_time >= 0.02 and now_time < 0.05:
+                                    #ÂıÇ°½ø
+                                    #print("ÂıÇ°½ø")
+                                    self.controller.move_cmd(530, 530)
+                                #³¬Ê±ÁË½üºõÍ£Ö¹
                                 else:
-                                    #å€’é€€
+                                    #µ¹ÍË
                                     self.controller.move_cmd(400, 400)
-                                    #print("å‰è¿›è¶…æ—¶!!!")
-                                    time.sleep(0.05)
-                                #æ›´æ–°t
+                                    #print("Ç°½ø³¬Ê±!!!")
+                                    time.sleep(0.03)
+                                #¸üĞÂt
                                 t = time.time()
                             
                             
 
-                            #å‰æ–¹æœ‰æ•Œäººã€èƒ½é‡å—æˆ–è€…ç‚¸å¼¹ä¸‰çº§åˆ¤ï¿½?
+                            #Ç°·½ÓĞµĞÈË¡¢ÄÜÁ¿¿é»òÕßÕ¨µ¯Èı¼¶ÅĞ¶Ï
                             elif enemy == 1:
-                                #æµ‹è¯•ç”¨çš„æ¯”èµ›æ³¨é‡Šï¿½?
+                                #²âÊÔÓÃµÄ±ÈÈü×¢ÊÍ
                                 # self.controller.move_cmd(750, 750)
-                                # print("#å‰æ–¹æœ‰æ•Œäººã€èƒ½é‡å—æˆ–è€…ç‚¸å¼¹id = ")
-                                #å¼€å¯æ‘„åƒå¤´
+                                # print("#Ç°·½ÓĞµĞÈË¡¢ÄÜÁ¿¿é»òÕßÕ¨µ¯id = ")
+                                #¿ªÆôÉãÏñÍ·
                                 ret,img = frame.read()
                                 print(ret)
-                                #ç»™idè®¾ä¸ªå€¼é˜²æ­¢å…¶æŠ¥é”™
+                                #¸øidÉè¸öÖµ·ÀÖ¹Æä±¨´í
                                 id = -1
                                 id = self.apriltag_detect_thread(img)
-                                #åˆ¤æ–­ä¸åŒidçš„çŠ¶ï¿½?
-                                print("#å‰æ–¹æœ‰æ•Œäººã€èƒ½é‡å—æˆ–è€…ç‚¸å¼¹id = ",id)
-                                #èƒ½é‡å—æ—¶å››çº§åˆ¤æ–­
-                                #è“æ–¹èƒ½é‡å—ä¸ºï¿½?1â€ï¼Œé»„æ–¹èƒ½é‡å—ä¸ºï¿½?2â€ï¼Œä¸­ç«‹èƒ½é‡å—ä¸ºï¿½?0ï¿½?,åˆ«æ¨è‡ªå·±ï¿½?
-                                #our_side = 0é»„æ–¹
-                                #our_side = 1è“æ–¹
-                                #å†³èµ›è§†é¢‘æ—¶èƒ½é‡å—ä¸ºï¿½?1ï¿½?,ç‚¸å¼¹ä¸ºï¿½?0ï¿½?
-                                #è“æ–¹èƒ½é‡ï¿½?1
-                                if id == 1 :
-                                    print("è“æ–¹èƒ½é‡ï¿½?")
-                                    #æŠŠé“²å­ç¨å¾®æŠ¬èµ·ä¸€ç‚¹å¯ä»¥ç¡®ä¿æŠŠ2.5KGçš„èƒ½é‡å—æ¨ä¸‹ï¿½?
-                                    #å‰è¿›,å¯èƒ½ä¼šæ‰ä¸‹å»,æ³¨æ„
-                                    #åˆ¤æ–­æ˜¯å¦æ˜¯é»„ï¿½?
-                                    if our_side == 0:
-                                        self.controller.move_cmd(800, 800)
-                                    #ç‚¸å¼¹
+                                #ÅĞ¶Ï²»Í¬idµÄ×´Ì¬
+                                print("#Ç°·½ÓĞµĞÈË¡¢ÄÜÁ¿¿é»òÕßÕ¨µ¯id = ",id)
+                                #ÄÜÁ¿¿éÊ±ËÄ¼¶ÅĞ¶Ï
+                                #À¶·½ÄÜÁ¿¿éÎª1£¬»Æ·½ÄÜÁ¿¿éÎª2¡±£¬ÖĞÁ¢ÄÜÁ¿¿éÎª0,±ğÍÆ×Ô¼ºµÄÄÜÁ¿¿é
+                                #our_side = 0»Æ·½
+                                #our_side = 1À¶·½
+                                #¾öÈüÊÓÆµÊ±ÄÜÁ¿¿éÎª1,Õ¨µ¯Îª0
+                                if id == 1:
+                                    print("¾öÈüÄÜÁ¿¿é")
+                                    #°Ñ²ù×ÓÉÔÎ¢Ì§ÆğÒ»µã¿ÉÒÔÈ·±£°Ñ3KGµÄÄÜÁ¿¿éÍÆÏÂÌ¨
+                                    #Ç°½ø,¿ÉÄÜ»áµôÏÂÈ¥,×¢Òâ
+                                    self.controller.move_cmd(660, 660)
+                                
+                                if id == 0:
+                                    print("¾öÈüÕ¨µ¯")
+                                    #ºóÍËµ«ÊÇÒª¼ì²âÊÇ·ñµ½±ßÔµ
+                                    t = time.time()
+                                    #Î´³¬Ê±ºÍÎ´¼ì²âµ½±ßÔµ
+                                    while(((time.time()-t)<0.6) and  self.edge_detect()== 0):
+                                        #ºóÍË
+                                        self.controller.move_cmd(-750, -750)
+                                    #×ªÍä
+                                    #±ßÔµ¸üĞÂ
+                                    n = self.edge_detect()
+                                    #²»ÔÚ±ßÔµ×ªÍäÎå¼¶ÅĞ¶Ï
+                                    if(n == 0):
+                                        self.controller.move_cmd(750, -750)
+                                        time.sleep(0.8)
+                                    #ÆäËûÇé¿ö½»¸øÄãÁËÎå¼¶ÅĞ¶Ï
                                     else:
-                                        print("è“æ–¹ç‚¸å¼¹")
-                                        #åé€€ä½†æ˜¯è¦æ£€æµ‹æ˜¯å¦åˆ°è¾¹ç¼˜
-                                        t = time.time()
-                                        #æœªè¶…æ—¶å’Œæœªæ£€æµ‹åˆ°è¾¹ç¼˜
-                                        while(((time.time()-t)<0.6) and  self.edge_detect()== 0):
-                                            #åé€€
-                                            self.controller.move_cmd(-950, -950)
-                                        #è½¬å¼¯
-                                        #è¾¹ç¼˜æ›´æ–°
-                                        n = self.edge_detect()
-                                        #ä¸åœ¨è¾¹ç¼˜è½¬å¼¯äº”çº§åˆ¤æ–­
-                                        if(n == 0):
-                                            self.controller.move_cmd(750, -750)
-                                            time.sleep(0.8)
-                                        #å…¶ä»–æƒ…å†µäº¤ç»™ä½ äº†äº”çº§åˆ¤æ–­
-                                        else:
-                                            #è¾¹ç¼˜åŠ¨ä½œ
-                                            self.edge_action()
-                                #ç‚¸å¼¹æ—¶å››çº§åˆ¤ï¿½?
-                                #ä¸­ç«‹èƒ½é‡ï¿½?0
-                                elif id == 0 :
-                                    print("ä¸­ç«‹èƒ½é‡ï¿½?")
-                                    #æŠŠé“²å­ç¨å¾®æŠ¬èµ·ä¸€ç‚¹å¯ä»¥ç¡®ä¿æŠŠ2.5KGçš„èƒ½é‡å—æ¨ä¸‹ï¿½?
-                                    #å‰è¿›,å¯èƒ½ä¼šæ‰ä¸‹å»,æ³¨æ„
-                                    self.controller.move_cmd(800, 800)
-                                #é»„æ–¹èƒ½é‡ï¿½?2
-                                elif id == 2 :
-                                    print("é»„æ–¹èƒ½é‡ï¿½?")
-                                    #åˆ¤æ–­æ˜¯å¦æ˜¯è“ï¿½?
-                                    if our_side == 1:
-                                        self.controller.move_cmd(800, 800)
-                                    #ç‚¸å¼¹
-                                    else:
-                                        print("é»„æ–¹ç‚¸å¼¹")
-                                        #åé€€ä½†æ˜¯è¦æ£€æµ‹æ˜¯å¦åˆ°è¾¹ç¼˜
-                                        t = time.time()
-                                        #æœªè¶…æ—¶å’Œæœªæ£€æµ‹åˆ°è¾¹ç¼˜
-                                        while(((time.time()-t)<0.6) and  self.edge_detect()== 0):
-                                            #åé€€
-                                            self.controller.move_cmd(-950, -950)
-                                        #è½¬å¼¯
-                                        #è¾¹ç¼˜æ›´æ–°
-                                        n = self.edge_detect()
-                                        #ä¸åœ¨è¾¹ç¼˜è½¬å¼¯äº”çº§åˆ¤æ–­
-                                        if(n == 0):
-                                            self.controller.move_cmd(750, -750)
-                                            time.sleep(0.8)
-                                        #å…¶ä»–æƒ…å†µäº¤ç»™ä½ äº†äº”çº§åˆ¤æ–­
-                                        else:
-                                            #è¾¹ç¼˜åŠ¨ä½œ
-                                            self.edge_action()
+                                        #±ßÔµ¶¯×÷
+                                        self.edge_action()
+
+                                # #À¶·½ÄÜÁ¿1
+                                # if id == 1 :
+                                #     print("À¶·½ÄÜÁ¿¿é")
+                                #     #°Ñ²ù×ÓÉÔÎ¢Ì§ÆğÒ»µã¿ÉÒÔÈ·±£°Ñ3KGµÄÄÜÁ¿¿éÍÆÏÂÌ¨
+                                #     #Ç°½ø,¿ÉÄÜ»áµôÏÂÈ¥,×¢Òâ
+                                #     #ÅĞ¶ÏÊÇ·ñÊÇ»ÆÉ«
+                                #     if our_side == 0:
+                                #         self.controller.move_cmd(600, 600)
+                                #     #Õ¨µ¯
+                                #     else:
+                                #         print("À¶·½Õ¨µ¯")
+                                #         #ºóÍËµ«ÊÇÒª¼ì²âÊÇ·ñµ½±ßÔµ
+                                #         t = time.time()
+                                #         #Î´³¬Ê±ºÍÎ´¼ì²âµ½±ßÔµ
+                                #         while(((time.time()-t)<0.6) and  self.edge_detect()== 0):
+                                #             #ºóÍË
+                                #             self.controller.move_cmd(-750, -750)
+                                #         #×ªÍä
+                                #         #±ßÔµ¸üĞÂ
+                                #         n = self.edge_detect()
+                                #         #²»ÔÚ±ßÔµ×ªÍäÎå¼¶ÅĞ¶Ï
+                                #         if(n == 0):
+                                #             self.controller.move_cmd(750, -750)
+                                #             time.sleep(0.8)
+                                #         #ÆäËûÇé¿ö½»¸øÄãÁËÎå¼¶ÅĞ¶Ï
+                                #         else:
+                                #             #±ßÔµ¶¯×÷
+                                #             self.edge_action()
+                                # #Õ¨µ¯Ê±ËÄ¼¶ÅĞ¶Ï
+                                # #ÖĞÁ¢ÄÜÁ¿¿é0£¬¾öÈüµÄÕ¨µ¯
+                                # elif id == 0 :
+                                #     print("ÖĞÁ¢ÄÜÁ¿¿é")
+                                #     #°Ñ²ù×ÓÉÔÎ¢Ì§ÆğÒ»µã¿ÉÒÔÈ·±£°Ñ2.5KGµÄÄÜÁ¿¿éÍÆÏÂÌ¨
+                                #     #Ç°½ø,¿ÉÄÜ»áµôÏÂÈ¥,×¢Òâ
+                                #     self.controller.move_cmd(800, 800)
+                                # #»Æ·½ÄÜÁ¿¿é2
+                                # elif id == 2 :
+                                #     print("»Æ·½ÄÜÁ¿¿é")
+                                #     #ÅĞ¶ÏÊÇ·ñÊÇÀ¶·½
+                                #     if our_side == 1:
+                                #         self.controller.move_cmd(600, 600)
+                                #     #Õ¨µ¯
+                                #     else:
+                                #         print("»Æ·½Õ¨µ¯")
+                                #         #ºóÍËµ«ÊÇÒª¼ì²âÊÇ·ñµ½±ßÔµ
+                                #         t = time.time()
+                                #         #Î´³¬Ê±ºÍÎ´¼ì²âµ½±ßÔµ
+                                #         while(((time.time()-t)<0.6) and  self.edge_detect()== 0):
+                                #             #ºóÍË
+                                #             self.controller.move_cmd(-850, -850)
+                                #         #×ªÍä
+                                #         #±ßÔµ¸üĞÂ
+                                #         n = self.edge_detect()
+                                #         #²»ÔÚ±ßÔµ×ªÍäÎå¼¶ÅĞ¶Ï
+                                #         if(n == 0):
+                                #             self.controller.move_cmd(750, -750)
+                                #             time.sleep(0.8)
+                                #         #ÆäËûÇé¿ö½»¸øÄãÁËÎå¼¶ÅĞ¶Ï
+                                #         else:
+                                #             #±ßÔµ¶¯×÷
+                                #             self.edge_action()
                                     
-                                #å½“idè¯†åˆ«ä¸åˆ°ä¸œè¥¿çš„æ—¶ï¿½?,å¯èƒ½æ—¶æ•Œæ–¹æœºå™¨äººï¼Œä¸æ’é™¤è§†è§‰å¯„äº†çš„æƒ…å†µå››çº§åˆ¤ï¿½?
+                                #µ±idÊ¶±ğ²»µ½¶«Î÷µÄÊ±,¿ÉÄÜÊ±µĞ·½»úÆ÷ÈË£¬²»ÅÅ³ıÊÓ¾õ¼ÄÁËµÄÇé¿öËÄ¼¶ÅĞ¶Ï
                                 elif id == None:
-                                    print("ä¸çŸ¥é“æ˜¯ä»€ä¹ˆä¸œï¿½?,å¯èƒ½æ˜¯æ•Œäººæˆ–å¤§éšœç¢ç‰©")
-                                    #å‰è¿›
-                                    self.controller.move_cmd(950, 950)
-                                    #å½“çº¢å¤–æµ‹è·æ£€æµ‹åˆ°æ¯”è¾ƒé«˜çš„å€¼æ—¶æŠŠå‰é“²ç¨å¾®æŠ¬èµ·æ¥ç‚¹å¯ä»¥ä¸€å®šç¨‹åº¦ä¸ŠæŠŠæ•Œäººé“²èµ·æ¥
-                                    #è¯»å–å‰æ–¹çº¢å¤–çš„ï¿½?
+                                    print("²»ÖªµÀÊÇÊ²Ã´¶«Î÷,¿ÉÄÜÊÇµĞÈË»ò´óÕÏ°­Îï")
+                                    #Ç°½ø
+                                    self.controller.move_cmd(650, 650)
+                                    #µ±ºìÍâ²â¾à¼ì²âµ½±È½Ï¸ßµÄÖµÊ±°ÑÇ°²ùÉÔÎ¢Ì§ÆğÀ´µã¿ÉÒÔÒ»¶¨³Ì¶ÈÉÏ°ÑµĞÈË²ùÆğÀ´
+                                    #¶ÁÈ¡Ç°·½ºìÍâµÄÖµ
                                     FD_red = self.controller.adc_data[5]
-                                    print("å‰æ–¹çº¢å¤–å€¼ä¸º ",FD_red)
-                                    # #å½“çº¢å¤–å€¼è¶³å¤Ÿå°æ—¶é“²å­è¦æ”¾ä¸‹
+                                    print("Ç°·½ºìÍâÖµÎª ",FD_red)
+                                    # #µ±ºìÍâÖµ×ã¹»Ğ¡Ê±²ù×ÓÒª·ÅÏÂ
                                     # if FD_red < 1100 :
                                     #     self.controller.up.CDS_SetAngle(5, 250, self.servo_speed)
                                     #     self.controller.up.CDS_SetAngle(7, 700, self.servo_speed)
-                                    # #å½“çº¢å¤–å€¼ç›¸å¯¹å¤§æ—¶å¯ä»¥é€‚å½“æŠ¬èµ·å…¶çˆªï¿½?
+                                    # #µ±ºìÍâÖµÏà¶Ô´óÊ±¿ÉÒÔÊÊµ±Ì§ÆğÆä×¦×Ó
                                     # else :
                                     #     self.controller.up.CDS_SetAngle(5, 270, self.servo_speed)
                                     #     self.controller.up.CDS_SetAngle(7, 680, self.servo_speed)
-                                #æˆ‘ä¹Ÿä¸çŸ¥é“ä»€ä¹ˆæƒ…ï¿½?,ä¹±åŠ¨å§å››çº§åˆ¤ï¿½?
+                                #ÎÒÒ²²»ÖªµÀÊ²Ã´Çé¿ö,ÂÒ¶¯°ÉËÄ¼¶ÅĞ¶Ï
                                 else:
-                                    print("æˆ‘ä¹Ÿä¸çŸ¥é“ä»€ä¹ˆæƒ…ï¿½?,ä¹±åŠ¨ï¿½?")
+                                    print("ÎÒÒ²²»ÖªµÀÊ²Ã´Çé¿ö,ÂÒ¶¯")
                                     self.randomm()
                             
-                            #å‰æ–¹å°éšœç¢ç‰©,åŒæœªæ£€æµ‹åˆ°ä¸€æ ·æ“ï¿½?,ä¸‰çº§åˆ¤æ–­
+                            #Ç°·½Ğ¡ÕÏ°­Îï,Í¬Î´¼ì²âµ½Ò»Ñù²Ù×÷,Èı¼¶ÅĞ¶Ï
                             elif enemy == 11:
-                                #è®¡ç®—å¼€å¯çš„æ—¶é—´ï¿½?
+                                #¼ÆËã¿ªÆôµÄÊ±¼ät
                                 now_time = time.time() - t
-                                #å¦‚æœæ—¶é—´å·®åœ¨0.02så†…å¿«ï¿½?
+                                #Èç¹ûÊ±¼ä²îÔÚ0.02sÄÚ¿ìËÙ
                                 if now_time < 0.02:
-                                    #å‰è¿›
-                                    #print("å¿«å‰ï¿½?")
-                                    self.controller.move_cmd(800, 800)
-                                #å¦‚æœæ—¶é—´å·®åœ¨0.05å†…å¯ä»¥ç¨å¾®æ…¢ï¿½?
+                                    #Ç°½ø
+                                    #print("¿ìÇ°½ø")
+                                    self.controller.move_cmd(610, 610)
+                                #Èç¹ûÊ±¼ä²îÔÚ0.05ÄÚ¿ÉÒÔÉÔÎ¢ÂıËÙ
                                 elif now_time >= 0.02 and now_time < 0.06:
-                                    #æ…¢å‰ï¿½?
-                                    #print("æ…¢å‰ï¿½?")
-                                    self.controller.move_cmd(600, 600)
-                                #è¶…æ—¶äº†å€’é€€ä¸€å°ä¼š
+                                    #ÂıÇ°½ø
+                                    #print("ÂıÇ°½ø")
+                                    self.controller.move_cmd(520, 520)
+                                #³¬Ê±ÁËµ¹ÍËÒ»Ğ¡»á
                                 else:
-                                    #å€’é€€
-                                    self.controller.move_cmd(-300, -300)
-                                    #print("å‰è¿›è¶…æ—¶!!!")
+                                    #µ¹ÍË
+                                    self.controller.move_cmd(300, 300)
+                                    #print("Ç°½ø³¬Ê±!!!")
                                     time.sleep(0.05)
-                                #æ›´æ–°t
+                                #¸üĞÂt
                                 t = time.time()
                             
-                            #åä¾§æœ‰æ•Œäººæœ‰ä¿©ç§åº”å¯¹æ–¹æ³•ä¸‰çº§åˆ¤æ–­
+                            #ºó²àÓĞµĞÈËÓĞÁ©ÖÖÓ¦¶Ô·½·¨Èı¼¶ÅĞ¶Ï
                             elif enemy == 2:
-                                print("enemy",enemy,"åæ–¹æœ‰æ•Œï¿½?")
-                                #å¼€å§‹æ—¶é—´æ£€ï¿½?
+                                print("enemy",enemy,"ºó·½ÓĞµĞÈË")
+                                #¿ªÊ¼Ê±¼ä¼ì²â
                                 t = time.time()
-                                #æœªè¶…æ—¶å’Œæœªæ£€æŸ¥æµ‹åˆ°è¾¹ç¼˜å››çº§åˆ¤ï¿½?
+                                #Î´³¬Ê±ºÍÎ´¼ì²é²âµ½±ßÔµËÄ¼¶ÅĞ¶Ï
                                 while (((time.time()-t)<0.1) and self.edge_detect() == 0):
-                                    #å‰è¿›
-                                    self.controller.move_cmd(700, 700)
-                                #æ›´æ–°æ—¶é—´
+                                    #Ç°½ø
+                                    self.controller.move_cmd(600, 600)
+                                #¸üĞÂÊ±¼ä
                                 t = time.time()
-                                #éšæœºè½¬å¼¯
+                                #Ëæ»ú×ªÍä
                                 a = random.randint(1,2)
-                                #å¼€å‰å…‰ç”µå››çº§åˆ¤ï¿½?
+                                #¿ªÇ°¹âµçËÄ¼¶ÅĞ¶Ï
                                 while (((time.time()-t)<1.2) and self.controller.adc_data[1] > 100 and self.edge_detect() == 0):
-                                    #å·¦è½¬
+                                    #×ó×ª
                                     if a == 1:
-                                        self.controller.move_cmd(-800, 800)
-                                    #å³è½¬
+                                        self.controller.move_cmd(-700, 700)
+                                    #ÓÒ×ª
                                     else:
-                                        self.controller.move_cmd(800, -800)
+                                        self.controller.move_cmd(700, -700)
                                 
                                 n = self.edge_detect()
-                                #æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                                #Î´¼ì²âµ½±ßÔµ
                                 if n == 0:
                                     self.controller.move_cmd(600, 600)
-                                #å…¶ä»–æƒ…å†µ
+                                #ÆäËûÇé¿ö
                                 else:
                                     self.edge_action()
 
-                            #å³ä¾§æœ‰æ•Œäººä¸‰çº§åˆ¤ï¿½?
+                            #ÓÒ²àÓĞµĞÈËÈı¼¶ÅĞ¶Ï
                             elif enemy == 3:
-                                print("enemy",enemy,"å³ä¾§æœ‰æ•Œï¿½?")
-                                #å¼€å¯æ—¶é—´æ£€ï¿½?
+                                print("enemy",enemy,"ÓÒ²àÓĞµĞÈË")
+                                #¿ªÆôÊ±¼ä¼ì²â
                                 t = time.time()
-                                #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜å…ˆåé€€
+                                #Î´³¬Ê±Î´¼ì²âµ½±ßÔµÏÈºóÍË
                                 while (((time.time()-t)<0.6) and self.edge_detect() == 0):
                                     self.controller.move_cmd(-700, -700)
-                                #æ›´æ–°t
+                                #¸üĞÂt
                                 t = time.time()
-                                #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜è½¬å¼¯
+                                #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ×ªÍä
                                 while(((time.time()-t)<0.7) and self.controller.adc_data[1] > 1000):
-                                    self.controller.move_cmd(-800, 800)
-                                #æš‚åœä¸€ï¿½?
+                                    self.controller.move_cmd(-700, 700)
+                                #ÔİÍ£Ò»ÏÂ
                                 self.controller.move_cmd(0,0)
                                 time.sleep(0.1)
 
-                            #å·¦ä¾§æœ‰æ•Œäººä¸‰çº§åˆ¤ï¿½?
+                            #×ó²àÓĞµĞÈËÈı¼¶ÅĞ¶Ï
                             elif enemy == 4:
-                                print("enemy",enemy,"å·¦ä¾§æœ‰æ•Œï¿½?")
-                                #å¼€å¯æ—¶é—´æ£€ï¿½?
+                                print("enemy",enemy,"×ó²àÓĞµĞÈË")
+                                #¿ªÆôÊ±¼ä¼ì²â
                                 t = time.time()
-                                #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜å…ˆåé€€
+                                #Î´³¬Ê±Î´¼ì²âµ½±ßÔµÏÈºóÍË
                                 while (((time.time()-t)<0.6) and self.edge_detect() == 0):
                                     self.controller.move_cmd(-700, -700)
-                                #æ›´æ–°t
+                                #¸üĞÂt
                                 t = time.time()
-                                #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜è½¬å¼¯
+                                #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ×ªÍä  ±¾À´0.7
                                 while(((time.time()-t)<0.7) and self.controller.adc_data[1] > 1000):
-                                    self.controller.move_cmd(800, -800)
-                                #æš‚åœä¸€ï¿½?
+                                    self.controller.move_cmd(700, -700)
+                                #ÔİÍ£Ò»ÏÂ
                                 self.controller.move_cmd(0,0)
                                 time.sleep(0.1)
 
-                            #ä¸çŸ¥é“ä»€ä¹ˆæƒ…ï¿½?
+                            #²»ÖªµÀÊ²Ã´Çé¿ö
                             else:
-                                print("å…‰ç”µæ£€æµ‹åˆ°äº†ä¸çŸ¥é“ä»€ä¹ˆä¸œï¿½?")
-                                #æ›´æ–°t
+                                print("¹âµç¼ì²âµ½ÁË²»ÖªµÀÊ²Ã´¶«Î÷")
+                                #¸üĞÂt
                                 t = time.time()
-                                #æœªè¶…ï¿½?
+                                #Î´³¬Ê±
                                 while  ((time.time() - t) and self.edge_detect() == 0):
-                                    #éšæœºè½¬å¼¯
+                                    #Ëæ»ú×ªÍä
                                     a = random.randint(1,2)
-                                    #å·¦è½¬
+                                    #×ó×ª
                                     if a == 1:
                                         self.controller.move_cmd(-800, 800)
-                                    #å³è½¬
+                                    #ÓÒ×ª
                                     else:
                                         self.controller.move_cmd(-800, 800)
 
-                    #å³å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–
+                    #ÓÒÇ°·½¼ì²âµ½ĞüÑÂ
                     if clif == 1:
-                        print("å³å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–")
-                        #æ›´æ–°t
+                        print("ÓÒÇ°·½¼ì²âµ½ĞüÑÂ")
+                        #¸üĞÂt
                         t = time.time()
-                        #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                        #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                         while (((time.time()-t)<0.5) and self.edge_detect() == 0):
-                            #åé€€
-                            self.controller.move_cmd(-900, -900)
-                        #æ›´æ–°
+                            #ºóÍË
+                            self.controller.move_cmd(-700, -700)
+                        #¸üĞÂ
                         t = time.time()
                         while  (((time.time()-t)<0.5) and self.edge_detect() == 0):
-                            #å³è½¬
+                            #ÓÒ×ª
                             self.controller.move_cmd(800, -750)
-                        #çŠ¶æ€å‚¨ï¿½?
+                        #×´Ì¬´¢Ì¬
                         if state_storage == 1:
-                            #é‡å¤å€¼åŠ ä¸€
+                            #ÖØ¸´Öµ¼ÓÒ»
                             repeat = repeat + 1
                         else:
                             repeat = 0
-                        #æ›´æ–°çŠ¶ï¿½?
+                        #¸üĞÂ×´Ì¬
                         state_storage = 1
                         
                         
-                    #å·¦å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–
+                    #×óÇ°·½¼ì²âµ½ĞüÑÂ
                     elif clif == 2:
-                        print("å·¦å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–")
-                        #æ›´æ–°t
+                        print("×óÇ°·½¼ì²âµ½ĞüÑÂ")
+                        #¸üĞÂt
                         t = time.time()
-                        #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                        #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                         while (((time.time()-t)<0.5) and self.edge_detect() == 0):
-                            #åé€€
-                            self.controller.move_cmd(-900, -900)
-                        #æ›´æ–°
+                            #ºóÍË
+                            self.controller.move_cmd(-700, -700)
+                        #¸üĞÂ
                         t = time.time()
                         while  (((time.time()-t)<0.5) and self.edge_detect() == 0):
-                            #å·¦è½¬
+                            #×ó×ª
                             self.controller.move_cmd(-750, 850)
-                        #çŠ¶æ€å‚¨ï¿½?
+                        #×´Ì¬´¢Ì¬
                         if state_storage == 2:
-                            #é‡å¤å€¼åŠ ä¸€
+                            #ÖØ¸´Öµ¼ÓÒ»
                             repeat = repeat + 1
                         else:
                             repeat = 0
-                        #æ›´æ–°çŠ¶ï¿½?
+                        #¸üĞÂ×´Ì¬
                         state_storage = 2
                         
-                    #æ­£å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–
+                    #ÕıÇ°·½¼ì²âµ½ĞüÑÂ
                     elif clif == 3:
-                        print("æ­£å‰æ–¹æ£€æµ‹åˆ°æ‚¬å´–")
-                        #æ›´æ–°t
+                        print("ÕıÇ°·½¼ì²âµ½ĞüÑÂ")
+                        #¸üĞÂt
                         t = time.time()
-                        #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                        #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                         while (((time.time()-t)<0.5) and self.edge_detect() == 0):
-                            #åé€€
-                            self.controller.move_cmd(-900, -900)
-                        #æ›´æ–°
+                            #ºóÍË
+                            self.controller.move_cmd(-700, -700)
+                        #¸üĞÂ
                         t = time.time()
                         while  (((time.time()-t)<1.0) and self.edge_detect() == 0):
-                            #éšæœºæ•°çš„ç§å­ç”Ÿæˆ
+                            #Ëæ»úÊıµÄÖÖ×ÓÉú³É
                             random.seed(t)
-                            #éšæœºï¿½?
+                            #Ëæ»ú×ªÏò
                             a = random.randint(1,2)
                             if a == 1:
-                                #å·¦è½¬
+                                #×ó×ª
                                 self.controller.move_cmd(-750, 850)
                             else:
-                                #å³è½¬
+                                #ÓÒ×ª
                                 self.controller.move_cmd(-750, 850)
-                        #çŠ¶æ€å‚¨ï¿½?
+                        #×´Ì¬´¢Ì¨
                         if state_storage == 3:
-                            #é‡å¤å€¼åŠ ä¸€
+                            #ÖØ¸´Öµ¼ÓÒ»
                             repeat = repeat + 1
                         else:
                             repeat = 0
-                        #æ›´æ–°çŠ¶ï¿½?
+                        #¸üĞÂ×´Ì¬
                         state_storage = 3
                        
-                #å…¶ä»–çš„æ£€ï¿½?
-                #å·¦å‰æ£€æµ‹åˆ°è¾¹ç¼˜
+                #ÆäËûµÄ¼ì²â
+                #×óÇ°¼ì²âµ½±ßÔµ
                 if edge == 1:
-                    print("å·¦å‰æ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("×óÇ°¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 1):
-                        self.controller.move_cmd(-900, -900)
+                        self.controller.move_cmd(-800, -800)
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 0):
                         self.controller.move_cmd(-750, 800)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 4:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 4
 
-                #å³å‰æ£€æµ‹åˆ°è¾¹ç¼˜
+                #ÓÒÇ°¼ì²âµ½±ßÔµ
                 elif edge == 2:
-                    print("å³å‰æ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("ÓÒÇ°¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 2):
-                        self.controller.move_cmd(-900, -900)
+                        self.controller.move_cmd(-800, -800)
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 0):
                         self.controller.move_cmd(800, -750)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 5:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 5
 
-                #å³åæ£€æµ‹åˆ°è¾¹ç¼˜
+                #ÓÒºó¼ì²âµ½±ßÔµ
                 elif edge == 4:
-                    print("å³åæ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("ÓÒºó¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 4):
-                        self.controller.move_cmd(900, 900)
-                    #çŠ¶æ€å‚¨ï¿½?
+                        self.controller.move_cmd(800, 800)
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 6:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 6
                 
-                #å·¦åæ£€æµ‹åˆ°è¾¹ç¼˜
+                #×óºó¼ì²âµ½±ßÔµ
                 elif edge == 3:
-                    print("å·¦åæ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("×óºó¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 3):
                         self.controller.move_cmd(900, 900)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 7:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 7
                     
-                #å‰æ£€æµ‹åˆ°è¾¹ç¼˜
+                #Ç°¼ì²âµ½±ßÔµ
                 elif edge == 5:
-                    print("å‰æ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("Ç°¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 5):
                         self.controller.move_cmd(-900, -900)
-                    #æ›´æ–°t
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 0):
                         self.controller.move_cmd(750, -800)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 8:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 8
                     
-                #åæµ‹åˆ°è¾¹ï¿½?
+                #ºó²âµ½±ßÔµ
                 elif edge == 6:
-                    print("åæ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("ºó¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 6):
                         self.controller.move_cmd(900, 900)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 9:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 9
                     
-                #å·¦ä¾§æ£€æµ‹åˆ°è¾¹ç¼˜
+                #×ó²à¼ì²âµ½±ßÔµ
                 elif edge == 7:
-                    print("å·¦ä¾§æ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("×ó²à¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 7):
                         self.controller.move_cmd(-750, 800)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 10:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 10
 
-                #å³ä¾§æ£€æµ‹åˆ°è¾¹ç¼˜
+                #ÓÒ²à¼ì²âµ½±ßÔµ
                 elif edge == 8:
-                    print("å³ä¾§æ£€æµ‹åˆ°è¾¹ç¼˜")
-                    #æ›´æ–°t
+                    print("ÓÒ²à¼ì²âµ½±ßÔµ")
+                    #¸üĞÂt
                     t = time.time()
-                    #æœªè¶…æ—¶æœªæ£€æµ‹åˆ°è¾¹ç¼˜
+                    #Î´³¬Ê±Î´¼ì²âµ½±ßÔµ
                     while (((time.time()-t)<0.3) and  self.edge_detect()== 8):
                         self.controller.move_cmd(800, -750)
-                    #çŠ¶æ€å‚¨ï¿½?
+                    #×´Ì¬´¢Ì¬
                     if state_storage == 11:
-                        #é‡å¤å€¼åŠ ä¸€
+                        #ÖØ¸´Öµ¼ÓÒ»
                         repeat = repeat + 1
                     else:
                         repeat = 0
-                    #æ›´æ–°çŠ¶ï¿½?
+                    #¸üĞÂ×´Ì¬
                     state_storage = 11
 
-                #ä¸çŸ¥é“ä»€ä¹ˆæƒ…å†µä¹±ï¿½?                              
+                #²»ÖªµÀÊ²Ã´Çé¿öÂÒ¶¯                             
                 else:
                     self.randomm()
                 
-                #é‡å¤å€¼è¶…ï¿½?20å°±ä¹±ï¿½?
-                print("é‡å¤ï¿½? = ",repeat)
-                if repeat >= 34:
+                #ÖØ¸´Öµ³¬¹ı20¾ÍÂÒ¶¯
+                print("ÖØ¸´Öµ = ",repeat)
+                if repeat >= 30:
                     self.randomm()
                     #repeat = 0
 
-            #æµ®ç©º
+            #¸¡¿Õ
             elif stage == 5:
-                print("å·²æµ®ï¿½?")
-                #åœä¸‹
+                print("ÒÑ¸¡¿Õ")
+                #Í£ÏÂ
                 self.randomm()
                 self.controller.move_cmd(0,0)
                 time.sleep(0.8)
-                #æ”¶èµ·é“²å­
+                #ÊÕÆğ²ù×Ó
                 self.default_platform()
                 
-            # ææµ…   
+            # ¸éÇ³   
             else:
                 self.randomm()
 
